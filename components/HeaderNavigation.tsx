@@ -61,6 +61,12 @@ Mateng Delivery
         >
           Settings
         </button> */}
+<Link
+  to="/batch-analyze"
+  className="font-semibold py-2 px-4 rounded text-gray-500 hover:text-brand-primary"
+>
+  Batch Analyze
+</Link>
 
 
 
