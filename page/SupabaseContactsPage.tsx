@@ -6,7 +6,7 @@ import { PrintIcon, EditIcon, TrashIcon } from '../components/Icons';
 import { HeaderNavigation } from '../components/HeaderNavigation';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import '../styles/supabaseContactsPage.css';
+import './jj.css'; // Assuming you have a CSS file for styles
 
 const DEFAULT_COLUMNS: ColumnConfig[] = [
   { key: 'six_digit_id', header: 'ID', visible: true },
