@@ -39,18 +39,19 @@ Mateng Delivery
           Home
         </Link>
 
-        <button
-          onClick={() => onNavigate('SCAN')}
-          className={`font-semibold py-2 px-4 rounded ${
-            appState === 'CAPTURING'
-              ? 'bg-brand-primary text-white'
-              : 'text-gray-500 hover:text-brand-primary'
-          }`}
-        >
-          Scan
-        </button>
+        {/* Replace the Scan button with this: */}
+<Link
+  to="/scan"
+  className={`font-semibold py-2 px-4 rounded ${
+    appState === 'CAPTURING'
+      ? 'bg-brand-primary text-white'
+      : 'text-gray-500 hover:text-brand-primary'
+  }`}
+>
+  Scan
+</Link>
 
-        <button
+        {/* <button
           onClick={() => onNavigate('SETTINGS')}
           className={`font-semibold py-2 px-4 rounded ${
             isSettingsOpen
@@ -59,7 +60,7 @@ Mateng Delivery
           }`}
         >
           Settings
-        </button>
+        </button> */}
 
 
 
@@ -68,7 +69,7 @@ Mateng Delivery
           to="/supabase-contacts"
           className="font-semibold py-2 px-4 rounded text-gray-500 hover:text-brand-primary"
         >
-          Supabase Contacts
+          Order List
         </Link>
         
       </nav>

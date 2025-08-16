@@ -9,6 +9,8 @@ import { extractDataFromImage } from '../services/geminiService';
 import { ColumnConfig, ExtractedData } from '../types';
 import { CameraIcon, SparklesIcon, ArrowUturnLeftIcon, CogIcon } from '../components/Icons';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
+import { useNavigate } from 'react-router-dom';
+
 import { HeaderNavigation } from '../components/HeaderNavigation';
 
 type AppState = 'IDLE' | 'CAPTURING' | 'PREVIEW' | 'ANALYZING' | 'RESULT' | 'ERROR' | 'EDITING';
@@ -32,6 +34,7 @@ export default function HomePage() {
   const [savedRecords, setSavedRecords] = useState<ExtractedData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+const navigate = useNavigate();
 
   const {
     isReady: isSheetReady,
@@ -166,12 +169,14 @@ export default function HomePage() {
     if (page === 'HOME') {
       setAppState('IDLE');
       setIsSettingsOpen(false);
-    } else if (page === 'SCAN') {
+    } 
+    else if (page === 'SCAN') {
       setAppState('CAPTURING');
       setIsSettingsOpen(false);
-    } else if (page === 'SETTINGS') {
-      setIsSettingsOpen(true);
-    }
+    } 
+    // else if (page === 'SETTINGS') {
+    //   setIsSettingsOpen(true);
+    // }
   };
 
   const renderContent = () => {
@@ -197,20 +202,20 @@ export default function HomePage() {
               onDelete={handleDeleteRecord}
             />
             <div className="flex items-center space-x-4 mx-auto mt-8">
-              <button
+              {/* <button
                 onClick={() => navigateTo('SETTINGS')}
                 className="bg-base-300 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center justify-center"
               >
                 <CogIcon className="w-6 h-6 mr-2" />
                 Customize
-              </button>
+              </button> */}
               <button
-                onClick={() => navigateTo('SCAN')}
-                className="bg-brand-primary hover:bg-brand-secondary text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center justify-center"
-              >
-                <CameraIcon className="w-6 h-6 mr-2" />
-                Scan New Contact
-              </button>
+      onClick={() => navigate('/scan')}
+      className="bg-brand-primary hover:bg-brand-secondary text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center justify-center"
+    >
+      <CameraIcon className="w-6 h-6 mr-2" />
+      Scan New Contact
+    </button>
             </div>
           </div>
         );
