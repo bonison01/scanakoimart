@@ -14,13 +14,13 @@ const DEFAULT_COLUMNS: ColumnConfig[] = [
   // { key: 'six_digit_id', header: 'ID', visible: true },
   { key: 'name', header: 'Name', visible: true },
   { key: 'phone', header: 'Phone', visible: true },
-  { key: 'company', header: 'Company', visible: true },
   { key: 'product_Amt', header: 'Product Amount', visible: true },
   { key: 'delivery_Amt', header: 'Delivery Amount', visible: true },
   { key: 'mode', header: 'Mode', visible: true },
   { key: 'date_added', header: 'Date Added', visible: true },
   { key: 'address', header: 'Address', visible: true },
   { key: 'total_amount', header: 'Total Amount', visible: true },
+  { key: 'company', header: 'Company', visible: true },
 ];
 
 
@@ -256,10 +256,13 @@ if (c.key === 'total_amount') {
 }
 
           if (c.key === 'company') {
-            row.innerHTML = `<strong>${c.header}:</strong> <span style="font-weight: bold; font-size: 22px;">${value}</span>`;
-          } else {
-            row.innerHTML = `<strong>${c.header}:</strong> ${value}`;
-          }
+  row.innerHTML = `<strong>${c.header}:</strong> <span style="font-weight: bold; font-size: 80px;">${value}</span>`;
+} else if (c.key === 'total_amount') {
+  row.innerHTML = `<strong>${c.header}:</strong> <span style="font-weight: bold; font-size: 30px;">${value}</span>`;
+} else {
+  row.innerHTML = `<strong>${c.header}:</strong> ${value}`;
+}
+
           content.appendChild(row);
         });
 
