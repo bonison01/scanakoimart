@@ -12,13 +12,13 @@ import JsBarcode from 'jsbarcode';
 
 const DEFAULT_COLUMNS: ColumnConfig[] = [
   // { key: 'six_digit_id', header: 'ID', visible: true },
+  { key: 'address', header: 'Address', visible: true },
   { key: 'name', header: 'Name', visible: true },
   { key: 'phone', header: 'Phone', visible: true },
   { key: 'product_Amt', header: 'Product Amount', visible: true },
   { key: 'delivery_Amt', header: 'Delivery Amount', visible: true },
   { key: 'mode', header: 'Mode', visible: true },
   { key: 'date_added', header: 'Date Added', visible: true },
-  { key: 'address', header: 'Address', visible: true },
   { key: 'total_amount', header: 'Total Amount', visible: true },
   { key: 'company', header: 'Company', visible: true },
 ];
@@ -111,7 +111,7 @@ export default function SupabaseContactsPage() {
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; background: white; color: black; }
             .print-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-            .company-name { font-size: 24px; font-weight: bold; }
+            .company-name { font-size: 35px; font-weight: bold; }
             .id-block { text-align: right; font-family: 'OCR A Std', monospace; }
             .id-number { font-size: 28px; letter-spacing: 6px; user-select: none; }
             .barcode-upc { margin-top: 8px; display: flex; justify-content: flex-end; gap: 2px; }
@@ -125,7 +125,7 @@ export default function SupabaseContactsPage() {
             .bar-6 { height: 50px; }
             .bar-7 { height: 90px; }
             .bar-8 { height: 50px; }
-            .bar-9 { height: 90px; }
+            .bar-9 { height: 150px; }
 
             h2 { font-size: 20px; margin-bottom: 10px; }
             ul { list-style: none; padding: 0; }
@@ -150,18 +150,27 @@ export default function SupabaseContactsPage() {
 
           <h2>Contact Details</h2>
           <ul>
-            ${columnConfig.filter(c => c.visible).map(c => {
-  if (c.key === 'total_amount') {
-    const deliveryAmt = parseFloat(contact.delivery_Amt) || 0;
-    const productAmt = parseFloat(contact.product_Amt) || 0;
-    const total = deliveryAmt + productAmt;
-    return `<li><strong>${c.header}:</strong> ${total.toFixed(2)}</li>`;
-  } else {
-    return `<li><strong>${c.header}:</strong> ${contact[c.key] || ''}</li>`;
-  }
-}).join('')}
+  ${columnConfig.filter(c => c.visible).map(c => {
+    let value = contact[c.key] || '';
+    if (c.key === 'total_amount') {
+      const deliveryAmt = parseFloat(contact.delivery_Amt) || 0;
+      const productAmt = parseFloat(contact.product_Amt) || 0;
+      value = (deliveryAmt + productAmt).toFixed(2);
+    }
 
-          </ul>
+    const largeFields = ['company', 'address'];
+    const isLarge = largeFields.includes(c.key);
+    
+    return `
+      <li>
+        <strong style="font-size: 50px;">${c.header}:</strong>
+        <span style="${isLarge ? 'font-size: 30px; font-weight: bold;' : ''}">
+          ${value}
+        </span>
+      </li>`;
+  }).join('')}
+</ul>
+
 
           <div class="thank-you">
             <p>Thank you for using our services!</p>
@@ -255,13 +264,20 @@ if (c.key === 'total_amount') {
   value = (deliveryAmt + productAmt).toFixed(2);
 }
 
-          if (c.key === 'company') {
-  row.innerHTML = `<strong>${c.header}:</strong> <span style="font-weight: bold; font-size: 80px;">${value}</span>`;
-} else if (c.key === 'total_amount') {
-  row.innerHTML = `<strong>${c.header}:</strong> <span style="font-weight: bold; font-size: 30px;">${value}</span>`;
-} else {
-  row.innerHTML = `<strong>${c.header}:</strong> ${value}`;
+          let fontSize = '18px';
+let fontWeight = 'normal';
+
+if (['company', 'address'].includes(c.key)) {
+  fontSize = '40px';
+  fontWeight = 'bold';
 }
+if (c.key === 'total_amount') {
+  fontSize = '26px';
+  fontWeight = 'bold';
+}
+
+row.innerHTML = `<strong style="font-size: 20px;">${c.header}:</strong> <span style="font-size: ${fontSize}; font-weight: ${fontWeight};">${value}</span>`;
+
 
           content.appendChild(row);
         });
@@ -435,8 +451,15 @@ if (c.key === 'total_amount') {
             </td>
           );
         } else {
+          // Style "address" and "company" to be larger
+          const isLargeField = ['address', 'company', 'name'].includes(col.key);
+
           return (
-            <td key={col.key} data-label={col.header}>
+            <td
+              key={col.key}
+              data-label={col.header}
+              style={isLargeField ? { fontSize: '1.2rem', fontWeight: 'bold' } : undefined}
+            >
               {contact[col.key]}
             </td>
           );
@@ -448,6 +471,7 @@ if (c.key === 'total_amount') {
     </tr>
   ))}
 </tbody>
+
 
             </table>
           </div>
