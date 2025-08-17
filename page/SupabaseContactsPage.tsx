@@ -7,15 +7,21 @@ import { HeaderNavigation } from '../components/HeaderNavigation';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import './jj.css';
+import JsBarcode from 'jsbarcode';
+
 
 const DEFAULT_COLUMNS: ColumnConfig[] = [
-  { key: 'six_digit_id', header: 'ID', visible: true },
+  // { key: 'six_digit_id', header: 'ID', visible: true },
   { key: 'name', header: 'Name', visible: true },
-  { key: 'email', header: 'Email', visible: true },
   { key: 'phone', header: 'Phone', visible: true },
+  { key: 'company', header: 'Company', visible: true },
+  { key: 'product_Amt', header: 'Product Amount', visible: true },
+  { key: 'delivery_Amt', header: 'Delivery Amount', visible: true },
+  { key: 'mode', header: 'Mode', visible: true },
   { key: 'date_added', header: 'Date Added', visible: true },
   { key: 'address', header: 'Address', visible: true },
 ];
+
 
 export default function SupabaseContactsPage() {
   const [contacts, setContacts] = useState<ExtractedData[]>([]);
@@ -161,84 +167,125 @@ export default function SupabaseContactsPage() {
   };
 
   const handleExportPDF = async () => {
-    try {
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
+  try {
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
 
-      const container = document.createElement('div');
-      container.style.position = 'fixed';
-      container.style.top = '0';
-      container.style.left = '0';
-      container.style.width = '800px';
-      container.style.padding = '20px';
-      container.style.background = 'white';
-      container.style.color = 'black';
-      container.style.zIndex = '-1';
-      document.body.appendChild(container);
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '1000px';
+    container.style.padding = '20px';
+    container.style.background = 'white';
+    container.style.color = 'black';
+    container.style.zIndex = '-1';
+    document.body.appendChild(container);
 
-      for (let i = 0; i < filteredContacts.length; i++) {
-        const contact = filteredContacts[i];
-        container.innerHTML = '';
+    for (let i = 0; i < filteredContacts.length; i++) {
+      const contact = filteredContacts[i];
+      container.innerHTML = '';
 
-        const header = document.createElement('div');
-        header.style.marginBottom = '20px';
-        header.innerHTML = `
-          <h1 style="margin:0; font-size:24px;">Mateng Delivery</h1>
-          <p style="margin:0;">Sagolband Sayang Leirak, near Indian Oil Pump</p>
-          <p style="margin:0;">Mobile: +918787649928</p>
-          <hr style="margin-top: 10px; margin-bottom: 20px;" />
-        `;
-        container.appendChild(header);
+      // Header
+      const header = document.createElement('div');
+      header.style.marginBottom = '20px';
+      header.innerHTML = `
+        <h1 style="margin:0; font-size:24px;">Mateng Delivery</h1>
+        <p style="margin:0;">Sagolband Sayang Leirak, near Indian Oil Pump</p>
+        <p style="margin:0;">Mobile: +918787649928</p>
+        <hr style="margin-top: 10px; margin-bottom: 20px;" />
+      `;
+      container.appendChild(header);
 
-        const content = document.createElement('div');
-        content.style.fontSize = '14px';
-        content.style.lineHeight = '1.5';
+      // Contact info container
+      const content = document.createElement('div');
+      content.style.fontSize = '18px';
+      content.style.lineHeight = '1.5';
 
-        columnConfig
-          .filter(c => c.visible)
-          .forEach(c => {
-            const row = document.createElement('div');
-            row.innerHTML = `<strong>${c.header}:</strong> ${contact[c.key] || ''}`;
-            content.appendChild(row);
-          });
-
-        container.appendChild(content);
-
-        const footer = document.createElement('div');
-        footer.style.marginTop = '30px';
-        footer.style.fontSize = '12px';
-        footer.style.color = 'gray';
-        footer.style.textAlign = 'center';
-        footer.innerHTML = `
-          <hr style="margin-bottom: 10px;" />
-          <p>Thank you for using our services!</p>
-          <p>Justmateng Service Pvt. ltd</p>
-        `;
-        container.appendChild(footer);
-
-        await new Promise(r => setTimeout(r, 100));
-
-        const canvas = await html2canvas(container, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#ffffff',
+      // Add contact fields
+      columnConfig
+        .filter(c => c.visible)
+        .forEach(c => {
+          const row = document.createElement('div');
+          const value = contact[c.key] || '';
+          if (c.key === 'company') {
+            row.innerHTML = `<strong>${c.header}:</strong> <span style="font-weight: bold; font-size: 22px;">${value}</span>`;
+          } else {
+            row.innerHTML = `<strong>${c.header}:</strong> ${value}`;
+          }
+          content.appendChild(row);
         });
 
-        const imgData = canvas.toDataURL('image/png');
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+      container.appendChild(content);
 
-        if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pdfHeight);
-      }
+      // --- Add barcode like in print ---
 
-      document.body.removeChild(container);
-      pdf.save('contacts.pdf');
-    } catch (error) {
-      console.error('PDF export failed:', error);
-      alert('Failed to export PDF. See console for details.');
+      // Create barcode container
+      const sixDigitId = contact.six_digit_id?.toString().padStart(6, '0') ?? '';
+      const barcodeDiv = document.createElement('div');
+      barcodeDiv.style.display = 'flex';
+      barcodeDiv.style.justifyContent = 'flex-end';
+      barcodeDiv.style.gap = '2px';
+      barcodeDiv.style.marginTop = '15px';
+
+      // Helper to create one bar div with height based on digit
+      const createBar = (digit: string) => {
+        const bar = document.createElement('div');
+        bar.style.width = '3px';
+        bar.style.backgroundColor = 'black';
+        bar.style.userSelect = 'none';
+
+        // Heights alternate between 50 and 90 px based on digit parity to mimic your style
+        // You can adjust this logic to match your exact style
+        const tallDigits = ['1', '3', '5', '7', '9'];
+        bar.style.height = tallDigits.includes(digit) ? '90px' : '50px';
+        return bar;
+      };
+
+      // Create bars for each digit
+      sixDigitId.split('').forEach(digit => {
+        barcodeDiv.appendChild(createBar(digit));
+      });
+
+      container.appendChild(barcodeDiv);
+
+      // Footer
+      const footer = document.createElement('div');
+      footer.style.marginTop = '30px';
+      footer.style.fontSize = '12px';
+      footer.style.color = 'gray';
+      footer.style.textAlign = 'center';
+      footer.innerHTML = `
+        <hr style="margin-bottom: 10px;" />
+        <p>Thank you for using our services!</p>
+        <p>Justmateng Service Pvt. ltd</p>
+      `;
+      container.appendChild(footer);
+
+      await new Promise(r => setTimeout(r, 100));
+
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pdfHeight);
     }
-  };
+
+    document.body.removeChild(container);
+    pdf.save('contacts.pdf');
+  } catch (error) {
+    console.error('PDF export failed:', error);
+    alert('Failed to export PDF. See console for details.');
+  }
+};
+
 
   const onNavigate = (page: 'VIEWING' | 'EDITING' | 'SETTINGS') => {
     setAppState(page);
