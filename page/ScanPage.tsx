@@ -38,6 +38,19 @@ export default function ScanPage() {
     setAppState('PREVIEW');
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setImageSrc(result);
+        setAppState('PREVIEW');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const savePhotoToDB = () => {
     if (!imageSrc) return;
 
@@ -48,7 +61,7 @@ export default function ScanPage() {
       id: Date.now().toString(),
       imageSrc: imageSrc,
       analyzed: false,
-      dateAdded: new Date().toISOString(), // Always ISO string here
+      dateAdded: new Date().toISOString(),
     };
 
     localStorage.setItem('visual-text-extractor-db', JSON.stringify([...parsed, newRecord]));
@@ -99,15 +112,10 @@ export default function ScanPage() {
       return;
     }
 
-    // Ensure dateAdded is ISO string (if user edited or changed)
     let dateAddedIso = data.dateAdded;
     try {
       const d = new Date(data.dateAdded);
-      if (!isNaN(d.getTime())) {
-        dateAddedIso = d.toISOString();
-      } else {
-        dateAddedIso = new Date().toISOString();
-      }
+      dateAddedIso = !isNaN(d.getTime()) ? d.toISOString() : new Date().toISOString();
     } catch {
       dateAddedIso = new Date().toISOString();
     }
@@ -123,9 +131,7 @@ export default function ScanPage() {
     const existing = localStorage.getItem('visual-text-extractor-db');
     const parsed = existing ? JSON.parse(existing) : [];
 
-    // Remove previous un-analyzed version (optional)
     const filtered = parsed.filter((item: any) => item.imageSrc !== imageSrc);
-
     localStorage.setItem('visual-text-extractor-db', JSON.stringify([...filtered, newRecord]));
 
     navigate('/');
@@ -147,7 +153,26 @@ export default function ScanPage() {
       <HeaderNavigation appState={appState} isSettingsOpen={isSettingsOpen} onNavigate={handleNavigate} />
 
       <main className="w-full max-w-3xl bg-base-200 rounded-2xl shadow-xl p-6 sm:p-8 flex items-center justify-center min-h-[400px]">
-        {appState === 'CAPTURING' && <WebcamCapture onPhotoTaken={handlePhotoTaken} />}
+        {appState === 'CAPTURING' && (
+          <div className="flex flex-col items-center space-y-6 w-full">
+            <WebcamCapture onPhotoTaken={handlePhotoTaken} />
+            <div className="flex flex-col items-center">
+              <label
+                htmlFor="file-upload"
+                className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+              >
+                Upload Image
+              </label>
+              <input
+                id="file-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+            </div>
+          </div>
+        )}
 
         {(appState === 'PREVIEW' || appState === 'SAVED') && (
           <div className="w-full flex flex-col items-center">
