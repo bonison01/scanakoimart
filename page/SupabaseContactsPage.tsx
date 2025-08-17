@@ -20,6 +20,7 @@ const DEFAULT_COLUMNS: ColumnConfig[] = [
   { key: 'mode', header: 'Mode', visible: true },
   { key: 'date_added', header: 'Date Added', visible: true },
   { key: 'address', header: 'Address', visible: true },
+  { key: 'total_amount', header: 'Total Amount', visible: true },
 ];
 
 
@@ -149,7 +150,17 @@ export default function SupabaseContactsPage() {
 
           <h2>Contact Details</h2>
           <ul>
-            ${columnConfig.filter(c => c.visible).map(c => `<li><strong>${c.header}:</strong> ${contact[c.key] || ''}</li>`).join('')}
+            ${columnConfig.filter(c => c.visible).map(c => {
+  if (c.key === 'total_amount') {
+    const deliveryAmt = parseFloat(contact.delivery_Amt) || 0;
+    const productAmt = parseFloat(contact.product_Amt) || 0;
+    const total = deliveryAmt + productAmt;
+    return `<li><strong>${c.header}:</strong> ${total.toFixed(2)}</li>`;
+  } else {
+    return `<li><strong>${c.header}:</strong> ${contact[c.key] || ''}</li>`;
+  }
+}).join('')}
+
           </ul>
 
           <div class="thank-you">
@@ -165,6 +176,36 @@ export default function SupabaseContactsPage() {
     printableWindow.document.write(printableHtml);
     printableWindow.document.close();
   };
+const handleDeleteFiltered = async () => {
+  if (filteredContacts.length === 0) {
+    alert('No filtered contacts to delete.');
+    return;
+  }
+
+  const confirmed = window.confirm(
+    `Are you sure you want to delete all ${filteredContacts.length} filtered contacts? This action cannot be undone.`
+  );
+  if (!confirmed) return;
+
+  try {
+    const idsToDelete = filteredContacts.map(contact => contact.id);
+
+    const { error } = await supabase
+      .from('contacts')
+      .delete()
+      .in('id', idsToDelete);
+
+    if (error) {
+      console.error('Error deleting filtered contacts:', error);
+      alert('Failed to delete contacts. Check the console for more details.');
+    } else {
+      setContacts(prev => prev.filter(c => !idsToDelete.includes(c.id)));
+    }
+  } catch (err) {
+    console.error('Unexpected error during deletion:', err);
+    alert('Unexpected error occurred.');
+  }
+};
 
   const handleExportPDF = async () => {
   try {
@@ -207,7 +248,13 @@ export default function SupabaseContactsPage() {
         .filter(c => c.visible)
         .forEach(c => {
           const row = document.createElement('div');
-          const value = contact[c.key] || '';
+          let value = contact[c.key] || '';
+if (c.key === 'total_amount') {
+  const deliveryAmt = parseFloat(contact.delivery_Amt) || 0;
+  const productAmt = parseFloat(contact.product_Amt) || 0;
+  value = (deliveryAmt + productAmt).toFixed(2);
+}
+
           if (c.key === 'company') {
             row.innerHTML = `<strong>${c.header}:</strong> <span style="font-weight: bold; font-size: 22px;">${value}</span>`;
           } else {
@@ -337,6 +384,15 @@ export default function SupabaseContactsPage() {
           >
             Save All as PDF
           </button>
+        </div><br />
+        <div>
+          <button
+  onClick={handleDeleteFiltered}
+  className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-4 rounded"
+>
+  Delete All Filtered Contacts
+</button>
+
         </div>
       </div>
 
@@ -363,27 +419,33 @@ export default function SupabaseContactsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredContacts.map(contact => (
-                  <tr key={contact.id}>
-                    {columnConfig.filter(c => c.visible).map(col => (
-                      <td key={col.key} data-label={col.header}>
-                        {contact[col.key]}
-                      </td>
-                    ))}
-                    <td className="action-buttons" data-label="Actions">
-                      <button onClick={() => setEditingContact(contact)} title="Edit">
-                        <EditIcon className="w-5 h-5 text-white" />
-                      </button>
-                      <button onClick={() => handleDelete(contact.id)} title="Delete">
-                        <TrashIcon className="w-5 h-5 text-white" />
-                      </button>
-                      <button onClick={() => handlePrint(contact)} title="Print">
-                        <PrintIcon className="w-5 h-5 text-white" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+  {filteredContacts.map(contact => (
+    <tr key={contact.id}>
+      {columnConfig.filter(c => c.visible).map(col => {
+        if (col.key === 'total_amount') {
+          const deliveryAmt = parseFloat(contact.delivery_Amt) || 0;
+          const productAmt = parseFloat(contact.product_Amt) || 0;
+          const total = deliveryAmt + productAmt;
+          return (
+            <td key={col.key} data-label={col.header}>
+              {total.toFixed(2)} {/* format with 2 decimals */}
+            </td>
+          );
+        } else {
+          return (
+            <td key={col.key} data-label={col.header}>
+              {contact[col.key]}
+            </td>
+          );
+        }
+      })}
+      <td className="action-buttons" data-label="Actions">
+        {/* action buttons */}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
             </table>
           </div>
         )}
