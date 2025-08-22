@@ -1,6 +1,6 @@
 // components/HeaderNavigation.tsx
 import React from 'react';
-import { Link } from 'react-router-dom'; // 👈 Import Link
+import { Link } from 'react-router-dom';
 
 type HeaderNavigationProps = {
   appState: string;
@@ -16,22 +16,10 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
   return (
     <header className="text-center mb-8 w-full max-w-4xl">
       <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-light">
-Mateng Delivery
+        Mateng Delivery
       </h1>
       <p className="mt-2 text-lg text-gray-400">Scan a business card. We'll do the rest.</p>
       <nav className="mt-6 flex justify-center space-x-6 flex-wrap">
-        {/* <button
-          onClick={() => onNavigate('HOME')}
-          className={`font-semibold py-2 px-4 rounded ${
-            appState === 'IDLE' && !isSettingsOpen
-              ? 'bg-brand-primary text-white'
-              : 'text-gray-500 hover:text-brand-primary'
-          }`}
-        >
-          Home
-        </button> */}
-
-        {/* ✅ Add Supabase Contacts Link */}
         <Link
           to="/"
           className="font-semibold py-2 px-4 rounded text-gray-500 hover:text-brand-primary"
@@ -39,45 +27,41 @@ Mateng Delivery
           Home
         </Link>
 
-        {/* Replace the Scan button with this: */}
-<Link
-  to="/scan"
-  className={`font-semibold py-2 px-4 rounded ${
-    appState === 'CAPTURING'
-      ? 'bg-brand-primary text-white'
-      : 'text-gray-500 hover:text-brand-primary'
-  }`}
->
-  Scan
-</Link>
-
-        {/* <button
-          onClick={() => onNavigate('SETTINGS')}
+        {/* Replaced the old Scan button with a Link */}
+        <Link
+          to="/scan"
           className={`font-semibold py-2 px-4 rounded ${
-            isSettingsOpen
+            appState === 'CAPTURING'
               ? 'bg-brand-primary text-white'
               : 'text-gray-500 hover:text-brand-primary'
           }`}
         >
-          Settings
-        </button> */}
-<Link
-  to="/batch-analyze"
-  className="font-semibold py-2 px-4 rounded text-gray-500 hover:text-brand-primary"
->
-  Batch Analyze
-</Link>
+          Scan
+        </Link>
 
+        {/* ✅ ADDED Scan Post Link */}
+        <Link
+          to="/scan-post"
+          className="font-semibold py-2 px-4 rounded text-gray-500 hover:text-brand-primary"
+        >
+          Scan Post
+        </Link>
 
+        {/* Added Batch Analyze Link */}
+        <Link
+          to="/batch-analyze"
+          className="font-semibold py-2 px-4 rounded text-gray-500 hover:text-brand-primary"
+        >
+          Batch Analyze
+        </Link>
 
-        {/* ✅ Add Supabase Contacts Link */}
+        {/* Added Supabase Contacts Link */}
         <Link
           to="/supabase-contacts"
           className="font-semibold py-2 px-4 rounded text-gray-500 hover:text-brand-primary"
         >
           Order List
         </Link>
-        
       </nav>
     </header>
   );
