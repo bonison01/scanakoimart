@@ -12,10 +12,10 @@ interface ExtractedData {
     senderName: string;
     receiverName: string;
     baseTariff: number;
-    remarks: string;
-    createdBy: string;
-    createdOn: string;
-    bulkReference: string;
+    // remarks: string;
+    // createdBy: string;
+    // createdOn: string;
+    // bulkReference: string;
 }
 
 // --- CONSTANTS ---
@@ -33,8 +33,7 @@ const LOADING_MESSAGES = [
 ];
 const columnOrder = [
     'serialNo', 'articleNumber', 'productType', 'weight',
-    'senderName', 'receiverName', 'baseTariff', 'remarks', 'createdBy',
-    'createdOn', 'bulkReference'
+    'senderName', 'receiverName', 'baseTariff'
 ];
 
 // Gemini setup
@@ -58,10 +57,10 @@ const responseSchema = {
             senderName: { type: Type.STRING },
             receiverName: { type: Type.STRING },
             baseTariff: { type: Type.NUMBER },
-            remarks: { type: Type.STRING },
-            createdBy: { type: Type.STRING },
-            createdOn: { type: Type.STRING },
-            bulkReference: { type: Type.STRING }
+            // remarks: { type: Type.STRING },
+            // createdBy: { type: Type.STRING },
+            // createdOn: { type: Type.STRING },
+            // bulkReference: { type: Type.STRING }
         },
     }
 };
