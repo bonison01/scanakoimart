@@ -19,9 +19,10 @@ const DEFAULT_CONFIG: ColumnConfig[] = [
   { key: 'name', header: 'Name', visible: true },
   { key: 'company', header: 'Company', visible: true },
   { key: 'phone', header: 'Phone', visible: true },
+  { key: 'qty', header: 'Weight', visible: true },
   { key: 'dateAdded', header: 'Date Added', visible: false },
   { key: 'address', header: 'Address', visible: true },
-  { key: 'delivery_Amt', header: 'Delivery Amount', visible: true },
+  { key: 'GST-IN', header: 'NO.', visible: true },
   { key: 'product_Amt', header: 'Product Amount', visible: true },
   { key: 'mode', header: 'Payment Mode', visible: true },
 ];

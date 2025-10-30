@@ -6,12 +6,15 @@ import '../styles/ScanPost.css';
 // Define the shape of the extracted data
 interface ExtractedData {
     serialNo: string;
+    GST_IN: number;
     articleNumber: string;
     productType: string;
-    weight: number;
+    // weight: number;
+    contactNumber: number;
+    Qty: number;
     senderName: string;
     receiverName: string;
-    baseTariff: number;
+    Total: number;
     // remarks: string;
     // createdBy: string;
     // createdOn: string;
@@ -32,8 +35,8 @@ const LOADING_MESSAGES = [
     "Almost done, finalizing the results..."
 ];
 const columnOrder = [
-    'serialNo', 'articleNumber', 'productType', 'weight',
-    'senderName', 'receiverName', 'baseTariff'
+    'serialNo', 'GST_IN','articleNumber', 'productType','weight','contactNumber',
+    'senderName', 'receiverName', 'Total'
 ];
 
 // Gemini setup
@@ -51,11 +54,14 @@ const responseSchema = {
         type: Type.OBJECT,
         properties: {
             serialNo: { type: Type.STRING },
+            GST_IN: { type: Type.NUMBER },
             articleNumber: { type: Type.STRING },
             productType: { type: Type.STRING },
             weight: { type: Type.NUMBER },
+            contactNumber: { type: Type.NUMBER },
+            Qty: { type: Type.NUMBER },
             senderName: { type: Type.STRING },
-            receiverName: { type: Type.STRING },
+            Total: { type: Type.STRING },
             baseTariff: { type: Type.NUMBER },
             // remarks: { type: Type.STRING },
             // createdBy: { type: Type.STRING },
