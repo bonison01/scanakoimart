@@ -11,11 +11,13 @@ interface ExtractedData {
     productType: string;
     // weight: number;
     contactNumber: number;
+    address: string;
     Qty: number;
-    senderName: string;
+    customerName: string;
+    no_of_bag: string;
     receiverName: string;
     Total: number;
-    // remarks: string;
+    remark: string;
     // createdBy: string;
     // createdOn: string;
     // bulkReference: string;
@@ -35,8 +37,8 @@ const LOADING_MESSAGES = [
     "Almost done, finalizing the results..."
 ];
 const columnOrder = [
-    'serialNo', 'GST_IN','articleNumber', 'productType','weight','contactNumber',
-    'senderName', 'receiverName', 'Total'
+    'serialNo', 'GST_IN','articleNumber','customerName','address','contactNumber', 'productType',
+    'weight','no_of_bag', 'remark','Total'
 ];
 
 // Gemini setup
@@ -59,11 +61,13 @@ const responseSchema = {
             productType: { type: Type.STRING },
             weight: { type: Type.NUMBER },
             contactNumber: { type: Type.NUMBER },
+            address: { type: Type.STRING },
             Qty: { type: Type.NUMBER },
-            senderName: { type: Type.STRING },
+            customerName: { type: Type.STRING },
+            no_of_bag: { type: Type.STRING },
             Total: { type: Type.STRING },
             baseTariff: { type: Type.NUMBER },
-            // remarks: { type: Type.STRING },
+            remark: { type: Type.STRING },
             // createdBy: { type: Type.STRING },
             // createdOn: { type: Type.STRING },
             // bulkReference: { type: Type.STRING }
